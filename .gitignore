@@ -1,0 +1,25 @@
+# dependencies
+/node_modules
+
+# Next.js build output
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# test output
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# local secrets: never commit. Copy .env.example to .env.local instead.
+.env
+.env.*
+!.env.example
+
+# local Supabase
+/supabase/.branches
+/supabase/.temp
+
+# macOS
+.DS_Store

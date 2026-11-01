@@ -1,0 +1,8 @@
+#!/bin/sh
+# Refuse the commit if any staged file looks like it holds a secret.
+files=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$files" ] && exit 0
+echo "$files" | tr '\n' '\0' | xargs -0 npx --no-install secretlint --secretlintignore .secretlintignore --maskSecrets || {
+  echo "pre-commit: secret scan found a possible secret. Commit refused." >&2
+  exit 1
+}
