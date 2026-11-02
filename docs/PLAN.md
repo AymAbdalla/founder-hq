@@ -254,7 +254,7 @@ Each job runs often and checks its own results. Each one is run once by hand dur
 
 **Open items found while building:**
 - **Slice 2, GitHub sign-in:** not built yet. It needs the GitHub sign-in app (a yes). Supabase links a GitHub sign-in to an existing account automatically when the emails match and are verified, which conflicts with "never merge without confirmation" (spec P2). This must be designed and tested when GitHub sign-in is added.
-- **Slice 2, sign-in limits:** HQ keeps its own per-address limits (`private.sign_in_events`). Supabase's per-IP limits count HQ's server, not each visitor, so they are only a backstop. Anyone can call the limit function directly and use up one address's sign-in emails for up to an hour; that is no worse than requesting codes for that address, but faster.
+- **Slice 2, sign-in limits:** HQ keeps its own per-address limits (`private.sign_in_events`). Supabase's per-IP limits count HQ's server, not each visitor, so they are only a backstop. Fixed Nov 2: only HQ's server can call the limit function (through `src/lib/supabase/admin.ts`). What remains is built into any per-address limit: someone can still ask HQ's sign-in form for codes to another person's address, five times an hour. That person can still sign in with the newest code in their inbox.
 - **Slice 3, hosted settings:** copy the local auth settings to the hosted project: the sign-in email template, allowed sign-in link addresses, and the 60-second email frequency.
 
 **Fog:**
