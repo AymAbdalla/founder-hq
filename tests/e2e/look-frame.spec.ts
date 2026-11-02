@@ -11,7 +11,9 @@ const VIEWS = [
   { path: "/plans", name: "Plans" },
   { path: "/everything", name: "Everything" },
 ];
-const PLACEHOLDERS = VIEWS.slice(1);
+// Views still waiting for their plan step. Projects was built in slice 5.
+const PLACEHOLDERS = VIEWS.filter((v) => v.path !== "/" && v.path !== "/projects");
+const SIGNED_IN_ONLY = VIEWS.slice(1);
 const DARK_GROUND = "rgb(16, 19, 18)";
 const LIGHT_GROUND = "rgb(255, 255, 255)";
 
@@ -41,7 +43,6 @@ test("the placeholder pages have a title and say which step brings them", async 
   await signInNewAccount(page, "frame-placeholders");
   const steps: Record<string, RegExp> = {
     "/inbox": /step 6 and 8/,
-    "/projects": /step 5/,
     "/plans": /step 12/,
     "/everything": /step 6 and 8/,
   };
@@ -54,7 +55,7 @@ test("the placeholder pages have a title and say which step brings them", async 
 });
 
 test("signed-out visits to the placeholder pages go to sign-in", async ({ page }) => {
-  for (const view of PLACEHOLDERS) {
+  for (const view of SIGNED_IN_ONLY) {
     await page.goto(view.path);
     await expect(page).toHaveURL(/\/sign-in$/);
   }

@@ -1,7 +1,7 @@
 import "server-only";
 import { logEvent } from "@/lib/log";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { ProjectInput, ProjectStatus } from "./input";
+import type { ProjectFields, ProjectInput, ProjectStatus } from "./input";
 
 // Thin database calls for projects. They run as the signed-in user, so row-level security
 // decides what is visible. Errors become plain messages; database text is never passed on.
@@ -50,7 +50,7 @@ export async function createProject(input: ProjectInput): Promise<ProjectResult<
   return { ok: true, value: data as Project };
 }
 
-export async function updateProject(id: string, input: ProjectInput): Promise<ProjectResult<Project>> {
+export async function updateProject(id: string, input: ProjectFields): Promise<ProjectResult<Project>> {
   const db = await createSupabaseServerClient();
   const { data, error } = await db.from("projects").update(input).eq("id", id).select(COLUMNS).single();
   if (error) return failure("update", error);

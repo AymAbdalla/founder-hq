@@ -11,6 +11,15 @@ export type ProjectInput = {
   status: ProjectStatus;
 };
 
+// The fields the edit form changes. Status changes through its own buttons, so an edit never resets it.
+export type ProjectFields = Omit<ProjectInput, "status">;
+
+// Project addresses carry a UUID. Anything else is "not found" before any database call.
+const PROJECT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export function isProjectId(value: unknown): value is string {
+  return typeof value === "string" && PROJECT_ID.test(value);
+}
+
 export type ProjectParse = { ok: true; value: ProjectInput } | { ok: false; problems: string[] };
 
 export const NAME_MAX = 80;
