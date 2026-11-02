@@ -26,7 +26,13 @@ Founder HQ is a free public web app for people building several projects with AI
 | `npm run check:build-secrets` | Fails if the key, or a secret-looking public setting, reaches browser code |
 | `npm run test:e2e` | Browser tests (Playwright, `tests/e2e/`) against the production build on port 3100 |
 
-Local Supabase (`npx supabase start`) needs Docker or OrbStack running.
+`npm test` and `npm run test:e2e` need local Supabase running: start OrbStack (or Docker), then `npx supabase start`. Write `.env.local` from `npx supabase status -o env` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the publishable key, `SUPABASE_SERVICE_ROLE_KEY` from the secret key). Sign-in emails land in the local mail catcher at http://127.0.0.1:54324.
+
+## Database
+
+- Every change is a new file in `supabase/migrations/`. Never edit a migration that has been committed; add a new one.
+- Every table that holds account data turns on row-level security, with policies that only allow `account_id = (select auth.uid())`, and is covered by the two-account isolation tests in `tests/integration/`.
+- Tables nobody should reach through the API go in the `private` schema. Functions use `security definer` only when needed, always with `set search_path = ''`.
 
 ## Security rules (plan section Security, S1 to S4)
 

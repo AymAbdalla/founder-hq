@@ -32,7 +32,7 @@ describe("request logs", () => {
       body: JSON.stringify({ apiKey: FAKE_KEY }),
     });
 
-    const response = proxy(request);
+    const response = await proxy(request);
 
     expect(response.status).toBe(403);
     const logs = output.join("\n");

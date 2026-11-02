@@ -58,6 +58,13 @@ export default defineConfig([
     },
   },
   {
+    // Tests never ship; they may create their own clients to act as test accounts.
+    files: ["tests/**"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+  {
     // The admin module is the only place allowed to read the master key.
     // Its own unit test may set a fake value.
     files: [ADMIN_MODULE, "tests/unit/admin-client.test.ts"],

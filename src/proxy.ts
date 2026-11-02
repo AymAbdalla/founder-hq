@@ -2,8 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { buildContentSecurityPolicy, createNonce } from "@/lib/security/csp";
 import { logEvent } from "@/lib/log";
 import { isForgedWrite } from "@/lib/security/same-origin";
+import { refreshSession } from "@/lib/supabase/proxy-session";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (isForgedWrite(request.method, request.headers, request.nextUrl.origin)) {
     logEvent("request_refused", { reason: "cross_site_write", method: request.method, path: request.nextUrl.pathname });
     return NextResponse.json({ error: "Request refused: it did not come from Founder HQ." }, { status: 403 });
@@ -17,7 +18,7 @@ export function proxy(request: NextRequest) {
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", csp);
 
-  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  const response = await refreshSession(request, requestHeaders);
   response.headers.set("Content-Security-Policy", csp);
   return response;
 }

@@ -252,6 +252,11 @@ Each job runs often and checks its own results. Each one is run once by hand dur
 - **Sign-in emails eaten by email scanners** that open links early. The 6-digit code from slice 2 covers it.
 - **Size.** This is a large build. Slices 1 to 10 give a usable HQ without GitHub and the helper, so you can use the development version well before launch.
 
+**Open items found while building:**
+- **Slice 2, GitHub sign-in:** not built yet. It needs the GitHub sign-in app (a yes). Supabase links a GitHub sign-in to an existing account automatically when the emails match and are verified, which conflicts with "never merge without confirmation" (spec P2). This must be designed and tested when GitHub sign-in is added.
+- **Slice 2, sign-in limits:** HQ keeps its own per-address limits (`private.sign_in_events`). Supabase's per-IP limits count HQ's server, not each visitor, so they are only a backstop. Anyone can call the limit function directly and use up one address's sign-in emails for up to an hour; that is no worse than requesting codes for that address, but faster.
+- **Slice 3, hosted settings:** copy the local auth settings to the hosted project: the sign-in email template, allowed sign-in link addresses, and the 60-second email frequency.
+
 **Fog:**
 - Helper on Linux (and Windows, open item 7): revisit after slice 15, when a Linux test machine is available.
 - Email reminders (open item 6): revisit after slice 9.
