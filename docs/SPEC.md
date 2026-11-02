@@ -30,7 +30,7 @@ People who build, run and grow projects (apps, side projects, businesses) have m
 
 **Proposed, not agreed:**
 - P1. Each account's data is private to that account. Nothing from one account appears in another account's views, search, export, notifications or AI tool responses. *Reason: a basic promise for any public product.*
-- P2. Sign-in by emailed link or with a GitHub account, with no passwords. Two sign-ins that share an email address are never merged without the user confirming. *Reason: nothing to store or reset, and GitHub sign-in suits the audience.*
+- P2. Sign-in by emailed link or with a GitHub account, with no passwords. A GitHub sign-in whose verified email matches an existing account joins that account. A GitHub email that is not verified never joins an existing account; it gets a separate one. *(Changed Nov 2 by Aym: use Supabase's standard account linking, instead of asking before two sign-ins are merged.)* *Reason: nothing to store or reset, and GitHub sign-in suits the audience.*
 - P3. A new account starts empty. A first-run screen gives three next steps: add a project, connect GitHub, add a first item.
 - P4. A user can download all their data as a file, and can delete their account. Deletion removes everything: projects, items, repo facts, GitHub connection, helper and AI tool connections, and notification sign-ups. Backups are cleared within a stated period (see Open items). *Reason: users expect this from a public product holding their data, and it is often a legal requirement.*
 - P5. Security: a list of signed-in devices with "sign out everywhere"; an email notice when a new helper or AI tool is connected.
@@ -337,6 +337,7 @@ All decisions were made by Aym in chat on Nov 1, 2026 and recorded in docs/PLAN.
 | Audience: people building, managing and running projects, side projects and businesses; software builders first; nothing assumes software | Chat Nov 2: "builders first, neutral core", then Aym's purpose wording; approved Nov 2 |
 | Waiting on, in its simple form (no chains or timelines) | Aym's purpose wording, Nov 2; rules approved Nov 2 |
 | AI tools in general, including Claude Desktop | Approved Nov 2 |
+| GitHub sign-in joins an existing account when its verified email matches (P2 changed) | Chat Nov 2: "we can have github sign in normally", then "do it all" |
 | Look: rows instead of cards, green means done, done-work grid, 7-day strips, plan progress as blocks | Mobbin research and prototype v2, approved Nov 2 ("i like it, approve it") |
 
 ## 8. Open items
