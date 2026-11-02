@@ -9,9 +9,9 @@ export function ConfirmForm({ tokenHash }: { tokenHash: string }) {
   return (
     <form action={confirm}>
       <input type="hidden" name="token_hash" value={tokenHash} />
-      <button type="submit" disabled={pending}>Finish signing in</button>
+      <button type="submit" className="btn btn-primary" disabled={pending}>Finish signing in</button>
       {state.message && (
-        <p role="alert">
+        <p role="alert" className="alert">
           {state.message} <Link href="/sign-in">Get a new code</Link>
         </p>
       )}

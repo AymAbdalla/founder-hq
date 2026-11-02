@@ -17,8 +17,8 @@ export function SignInForm() {
       <form action={sendEmail}>
         <label htmlFor="email">Email</label>
         <input id="email" name="email" type="email" autoComplete="email" required defaultValue={emailState.email} />
-        <button type="submit" disabled={sending}>Email me a sign-in code</button>
-        {emailState.message && <p role="alert">{emailState.message}</p>}
+        <button type="submit" className="btn btn-primary" disabled={sending}>Email me a sign-in code</button>
+        {emailState.message && <p role="alert" className="alert">{emailState.message}</p>}
       </form>
     );
   }
@@ -30,13 +30,13 @@ export function SignInForm() {
         <input type="hidden" name="email" value={email} />
         <label htmlFor="code">6-digit code</label>
         <input id="code" name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]*" required />
-        <button type="submit" disabled={checking}>Sign in</button>
-        {codeState.message && <p role="alert">{codeState.message}</p>}
+        <button type="submit" className="btn btn-primary" disabled={checking}>Sign in</button>
+        {codeState.message && <p role="alert" className="alert">{codeState.message}</p>}
       </form>
       <form action={sendEmail}>
         <input type="hidden" name="email" value={email} />
-        <button type="submit" disabled={sending}>Send a new code</button>
-        {emailState.message && <p role="alert">{emailState.message}</p>}
+        <button type="submit" className="btn" disabled={sending}>Send a new code</button>
+        {emailState.message && <p role="alert" className="alert">{emailState.message}</p>}
       </form>
     </>
   );

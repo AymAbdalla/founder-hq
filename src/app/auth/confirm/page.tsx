@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { Brand } from "@/components/icons";
 import { ConfirmForm } from "./confirm-form";
 
 export const metadata = { title: "Finish signing in · Founder HQ" };
@@ -9,7 +10,8 @@ export default async function ConfirmPage({ searchParams }: { searchParams: Prom
   await connection();
   const { token_hash: tokenHash = "" } = await searchParams;
   return (
-    <main>
+    <main className="auth">
+      <Brand />
       <h1>Finish signing in</h1>
       <ConfirmForm tokenHash={tokenHash} />
     </main>
