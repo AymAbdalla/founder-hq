@@ -2,7 +2,7 @@
 
 A free web app for people building several projects with AI coding tools: projects, to-dos, reminders, ideas and features in one place, with repo activity filled in from GitHub and a helper on your computer, and a connection your AI coding tools can read and add to.
 
-Status: early build. Slice 1 of 19 (foundation and security baseline).
+Status: early build. Slices 1 and 2 of 19 (foundation, security baseline, sign-in).
 
 - What it does: [docs/SPEC.md](docs/SPEC.md)
 - How it is built: [docs/PLAN.md](docs/PLAN.md)
@@ -19,3 +19,21 @@ npm run dev
 ```
 
 Then open http://localhost:3000. `npm run check` runs every test and check.
+
+Sign-in and the tests need local Supabase: start OrbStack (or Docker), then `npx supabase start`, and write `.env.local` as [AGENTS.md](AGENTS.md) describes. Sign-in emails land in the local mail catcher at http://127.0.0.1:54324.
+
+### GitHub sign-in on your computer
+
+Register your own GitHub OAuth app for local use at https://github.com/settings/applications/new:
+
+- Homepage URL: `http://localhost:3000`
+- Authorization callback URL: `http://127.0.0.1:54321/auth/v1/callback`
+
+Generate a client secret, then put both values in `supabase/.env` (git ignores it) and restart Supabase:
+
+```
+GITHUB_OAUTH_CLIENT_ID=
+GITHUB_OAUTH_CLIENT_SECRET=
+```
+
+The live site uses a separate GitHub app, because each app has one callback address.
