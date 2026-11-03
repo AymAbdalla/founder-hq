@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "supabase:github-fake": "node scripts/supabase-github.mjs fake",
+    "supabase:github-real": "node scripts/supabase-github.mjs real",
     "secrets": "git ls-files -z --cached --others --exclude-standard | xargs -0 secretlint --secretlintignore .secretlintignore --maskSecrets",
     "audit": "npm audit --omit=dev --audit-level=low && npm audit --audit-level=high",
     "check:build-secrets": "node scripts/check-build-secrets.mjs",

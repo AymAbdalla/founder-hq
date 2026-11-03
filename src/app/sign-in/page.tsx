@@ -7,6 +7,7 @@ export const metadata = { title: "Sign in · Founder HQ" };
 // Fixed messages only: nothing from the address bar is shown on the page.
 const ERRORS: Record<string, string> = {
   github: "GitHub sign-in didn't finish. Try again, or sign in with an emailed code.",
+  "github-email": "GitHub says that email address isn't verified yet. Verify it on GitHub, then try again, or sign in with an emailed code.",
 };
 
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {

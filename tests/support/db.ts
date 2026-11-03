@@ -9,3 +9,9 @@ export function localSql(query: string): void {
 export function sqlText(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;
 }
+
+// Reads rows from the local Supabase database, for checking what a test left behind.
+export function sqlRows(query: string): Record<string, unknown>[] {
+  const out = execFileSync("npx", ["supabase", "db", "query", "--local", query], { stdio: ["ignore", "pipe", "pipe"] });
+  return JSON.parse(out.toString()).rows;
+}

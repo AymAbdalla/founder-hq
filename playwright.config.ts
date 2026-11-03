@@ -6,6 +6,7 @@ const PORT = 3100;
 
 export default defineConfig({
   testDir: "tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: true,
   reporter: "list",
   use: { baseURL: `http://localhost:${PORT}` },

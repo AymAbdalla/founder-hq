@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
+import { FAKE_GITHUB_ORIGIN } from "../support/fake-github";
 
 // Slice 2 (docs/PLAN.md): sign-in with GitHub. Spec P2.
-// These tests never contact GitHub: they stop at the redirect that would go there.
-// They need the local GitHub sign-in app's two values in supabase/.env (see README).
-// Signing in with a real GitHub account is the manual part of the slice 2 acceptance check.
+// These tests stop at the redirect that would go to GitHub. Local Supabase runs in fake-GitHub
+// mode for tests (`npm run supabase:github-fake`), so that redirect points at the fake.
+// github-sign-in-complete.spec.ts follows a sign-in all the way back to HQ.
 
 const SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321";
 const FAILED = "GitHub sign-in didn't finish. Try again, or sign in with an emailed code.";
@@ -33,11 +34,12 @@ test("Continue with GitHub sends you to GitHub, set up to come back to HQ", asyn
   expect(verifier, "a code-verifier cookie").toBeDefined();
   expect(verifier!.httpOnly).toBe(true);
 
-  // Supabase sends the browser on to GitHub's own sign-in page with HQ's GitHub app.
+  // Supabase sends the browser on to GitHub's sign-in page (here the tests' fake) with HQ's GitHub app.
   const supabase = await page.request.get(start.toString(), { maxRedirects: 0 });
   expect(supabase.status()).toBe(302);
   const github = new URL(supabase.headers()["location"]);
-  expect(github.origin + github.pathname).toBe("https://github.com/login/oauth/authorize");
+  expect(github.origin, "local Supabase must be in fake-GitHub mode: npm run supabase:github-fake").toBe(FAKE_GITHUB_ORIGIN);
+  expect(github.pathname).toBe("/login/oauth/authorize");
   expect(github.searchParams.get("client_id")).toBeTruthy();
   expect(github.searchParams.get("redirect_uri")).toBe(`${SUPABASE}/auth/v1/callback`);
 });

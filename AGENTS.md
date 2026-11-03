@@ -25,8 +25,10 @@ Founder HQ is a free public web app for people building several projects with AI
 | `npm run build:canary` | Production build with a fake master key, so the next step can look for it |
 | `npm run check:build-secrets` | Fails if the key, or a secret-looking public setting, reaches browser code |
 | `npm run test:e2e` | Browser tests (Playwright, `tests/e2e/`) against the production build on port 3100 |
+| `npm run supabase:github-fake` | Restart local Supabase with GitHub sign-in pointed at the tests' fake GitHub. The browser tests need this mode. Data is kept. |
+| `npm run supabase:github-real` | Restart local Supabase with real GitHub sign-in, to try it with your own GitHub account. Data is kept. |
 
-`npm test` and `npm run test:e2e` need local Supabase running: start OrbStack (or Docker), then `npx supabase start`. Write `.env.local` from `npx supabase status -o env` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the publishable key, `SUPABASE_SERVICE_ROLE_KEY` from the secret key). Sign-in emails land in the local mail catcher at http://127.0.0.1:54324.
+`npm test` and `npm run test:e2e` need local Supabase running: start OrbStack (or Docker), then `npm run supabase:github-fake` (or `npx supabase start` for unit tests only). The fake GitHub listens on fixed port 54390, an agreed exception to the port-0 rule below, because Supabase must know its address when it starts. Write `.env.local` from `npx supabase status -o env` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the publishable key, `SUPABASE_SERVICE_ROLE_KEY` from the secret key). Sign-in emails land in the local mail catcher at http://127.0.0.1:54324.
 
 ## Database
 

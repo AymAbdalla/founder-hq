@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const code = params.get("code");
   if (!code || params.has("error")) {
-    logEvent("github_sign_in_failed", { reason: params.has("error") ? "provider_error" : "no_code" });
-    redirect("/sign-in?error=github");
+    // Supabase refuses a GitHub email that GitHub has not verified (spec P2). Only this fixed
+    // code is recognised; no text from the address is passed on.
+    const unverified = params.get("error_code") === "provider_email_needs_verification";
+    logEvent("github_sign_in_failed", { reason: unverified ? "email_unverified" : params.has("error") ? "provider_error" : "no_code" });
+    redirect(unverified ? "/sign-in?error=github-email" : "/sign-in?error=github");
   }
 
   const supabase = await createSupabaseServerClient();

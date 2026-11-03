@@ -20,7 +20,7 @@ npm run dev
 
 Then open http://localhost:3000. `npm run check` runs every test and check.
 
-Sign-in and the tests need local Supabase: start OrbStack (or Docker), then `npx supabase start`, and write `.env.local` as [AGENTS.md](AGENTS.md) describes. Sign-in emails land in the local mail catcher at http://127.0.0.1:54324.
+Sign-in and the tests need local Supabase: start OrbStack (or Docker), then `npm run supabase:github-fake`, and write `.env.local` as [AGENTS.md](AGENTS.md) describes. Sign-in emails land in the local mail catcher at http://127.0.0.1:54324.
 
 ### GitHub sign-in on your computer
 
@@ -37,3 +37,13 @@ GITHUB_OAUTH_CLIENT_SECRET=
 ```
 
 The live site uses a separate GitHub app, because each app has one callback address.
+
+GitHub sign-in has two local modes. The browser tests need **fake** mode, where a small fake GitHub (started by the tests) stands in for github.com, so a whole sign-in can be tested, including how a matching email joins an account. To try "Continue with GitHub" with your own account, switch to **real** mode, and switch back before running the tests. Both keep your local data.
+
+```
+npm run supabase:github-real
+```
+
+```
+npm run supabase:github-fake
+```
