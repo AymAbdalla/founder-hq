@@ -184,3 +184,19 @@ test("at phone width the projects pages do not scroll sideways", async ({ page }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), path).toBe(true);
   }
 });
+
+test("a longest-allowed project name with no spaces still fits a 400px screen (independent check F3)", async ({ page }) => {
+  await signInNewAccount(page, "proj-longname");
+  const name = "W".repeat(80);
+  await newProject(page, { name, summary: "S".repeat(200) });
+  const projectPage = new URL(page.url()).pathname;
+  await page.setViewportSize({ width: 400, height: 844 });
+  for (const theme of ["light", "dark"]) {
+    await page.context().addCookies([{ name: "hq-theme", value: theme, url: page.url() }]);
+    for (const path of ["/projects", projectPage, projectPage + "/edit", projectPage + "/delete"]) {
+      await page.goto(path);
+      const width = await page.evaluate(() => document.documentElement.scrollWidth);
+      expect(width, `${theme} ${path}`).toBeLessThanOrEqual(400);
+    }
+  }
+});

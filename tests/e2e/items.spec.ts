@@ -330,3 +330,20 @@ test("after an add, the add box starts fresh, so the next item doesn't land in t
   await page.goto("/inbox");
   await expect(row(group(page, "To sort"), "Call the accountant")).toBeVisible();
 });
+
+test("a longest-allowed item title and project name with no spaces fit a 400px screen (independent check F3)", async ({ page }) => {
+  await signInNewAccount(page, "items-longtitle");
+  const projectPage = await newProject(page, "W".repeat(80));
+  const title = "T".repeat(200);
+  await addItem(page, { title });
+  await openItem(page, group(page, "To-dos and reminders"), title);
+  const itemPage = new URL(page.url()).pathname;
+  await page.goto("/");
+  await addItem(page, { title: "Inbox item", date: await browserDate(page) });
+  await page.setViewportSize({ width: 400, height: 844 });
+  for (const path of ["/", "/inbox", projectPage, projectPage + "/delete", itemPage, itemPage + "/delete"]) {
+    await page.goto(path);
+    const width = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(width, path).toBeLessThanOrEqual(400);
+  }
+});

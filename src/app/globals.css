@@ -389,3 +389,13 @@ svg.status .bars { stroke: var(--text-3); stroke-width: 1.5; stroke-linecap: rou
   .row .proj + .due { padding-left: 0; }
   .field-row { grid-template-columns: 1fr; }
 }
+
+/* Long names and titles with no spaces (independent check F3): text the user typed may break
+   anywhere, and items in a flex row may shrink below their text's width, so nothing pushes
+   the page wider than the screen. */
+.page-head > * { min-width: 0; }
+.page-head h1, .crumbs, .facts > *, .lede, .pname a, .pname .sum, .empty-row, .choice legend, .alert, .form-alert { overflow-wrap: anywhere; }
+.ptable { width: 100%; }
+.pname > span { min-width: 0; }
+.chip-select, .wait-add select, .field select { text-overflow: ellipsis; }
+.wait-add select { min-width: 0; flex: 1 1 200px; }
