@@ -38,7 +38,19 @@ export function dueText(item: Pick<Item, "due_date" | "due_time" | "done_at">, t
   return { text, tone };
 }
 
-export function ItemRow({ item, today, hideProject = false, inOverdueGroup = false }: { item: Item; today: string; hideProject?: boolean; inOverdueGroup?: boolean }) {
+export function ItemRow({
+  item,
+  today,
+  hideProject = false,
+  inOverdueGroup = false,
+  extra,
+}: {
+  item: Item;
+  today: string;
+  hideProject?: boolean;
+  inOverdueGroup?: boolean;
+  extra?: React.ReactNode;
+}) {
   const waitingOn = item.waitsOn.filter((w) => !w.done).map((w) => w.title);
   const icon = KIND_ICON[item.kind];
   const due = dueText(item, today, inOverdueGroup);
@@ -69,6 +81,7 @@ export function ItemRow({ item, today, hideProject = false, inOverdueGroup = fal
         </Link>
       )}
       <span className={`due ${due.tone}`.trim()}>{due.text}</span>
+      {extra}
     </li>
   );
 }
@@ -80,6 +93,7 @@ export function ItemGroup({
   empty,
   tone,
   hideProject,
+  extra,
 }: {
   title: string;
   items: Item[];
@@ -87,6 +101,7 @@ export function ItemGroup({
   empty?: string;
   tone?: "overdue";
   hideProject?: boolean;
+  extra?: (item: Item) => React.ReactNode;
 }) {
   if (items.length === 0 && !empty) return null;
   return (
@@ -97,7 +112,7 @@ export function ItemGroup({
       {items.length > 0 ? (
         <ul className="rows">
           {items.map((item) => (
-            <ItemRow key={item.id} item={item} today={today} hideProject={hideProject} inOverdueGroup={tone === "overdue"} />
+            <ItemRow key={item.id} item={item} today={today} hideProject={hideProject} inOverdueGroup={tone === "overdue"} extra={extra?.(item)} />
           ))}
         </ul>
       ) : (

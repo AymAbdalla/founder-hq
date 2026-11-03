@@ -1,17 +1,18 @@
 import { connection } from "next/server";
 import { AddItem } from "@/components/add-item";
 import { AppFrame } from "@/components/app-frame";
+import { DoneGrid } from "@/components/done-grid";
 import { ItemGroup, pickerProjects } from "@/components/items";
 import { requireSignedIn } from "@/components/signed-in";
 import { todayIn } from "@/lib/dates";
-import { listItems } from "@/lib/items/data";
+import { listDone, listItems } from "@/lib/items/data";
 import { todayGroups } from "@/lib/items/views";
 import { currentTimeZone, hoursAgo } from "@/lib/time-zone";
 
 // Spec P14 and the Nov 2 rule: overdue, today, the next 7 days, later, and open items with no
 // date. Items waiting on other items, items in archived projects and ideas with no date stay
 // out. A brand-new account sees the first-run screen instead (spec P3).
-// Plan slice 8 adds the done-work grid and finishes this view.
+// Above them, the done-work grid for the last year (spec 3.4).
 export default async function Home() {
   // Render per request so each page gets its own CSP nonce (security rule S1).
   await connection();
@@ -20,7 +21,12 @@ export default async function Home() {
   const zone = await currentTimeZone();
   const today = todayIn(zone);
   const since = hoursAgo(26);
-  const [open, recent, projects] = await Promise.all([listItems({ open: true }), listItems({ doneSince: since }), pickerProjects()]);
+  const [open, recent, projects, year] = await Promise.all([
+    listItems({ open: true }),
+    listItems({ doneSince: since }),
+    pickerProjects(),
+    listDone(hoursAgo(54 * 7 * 24)),
+  ]);
   const doneToday = (recent.ok ? recent.value : []).filter((i) => i.done_at && todayIn(zone, new Date(i.done_at)) === today);
 
   if (open.ok && open.value.length === 0 && doneToday.length === 0 && projects.length === 0) {
@@ -36,8 +42,8 @@ export default async function Home() {
       <div className="page-head">
         <h1>Today</h1>
         <span className="when">{date}</span>
-        <span className="head-note">{doneToday.length} done today</span>
       </div>
+      <DoneGrid doneAts={year.ok ? year.value.map((d) => d.done_at) : []} timeZone={zone} today={today} weeks={53} span="the last year" />
       <AddItem projects={projects} />
       {!open.ok && (
         <p role="alert" className="alert">

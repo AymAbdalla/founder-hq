@@ -38,6 +38,9 @@ export async function AppFrame({ current, project, children }: { current: string
   const projects = active.ok ? active.value : [];
   return (
     <div className="app">
+      <a className="skip" href="#main">
+        Skip to main content
+      </a>
       <aside className="rail">
         <Brand />
         <nav className="nav" aria-label="Main">
@@ -70,7 +73,9 @@ export async function AppFrame({ current, project, children }: { current: string
             <SignOut />
           </div>
         </header>
-        <main className="page">{children}</main>
+        <main className="page" id="main" tabIndex={-1}>
+          {children}
+        </main>
       </div>
       <nav className="tabbar" aria-label="Main">
         <NavLinks current={current} />

@@ -3,10 +3,10 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { isTimeZone, todayIn } from "@/lib/dates";
-import { addWait, createItem, deleteItem, getItem, removeWait, setItemDone, updateItem } from "@/lib/items/data";
+import { addWait, createItem, deleteItem, getItem, moveItem, removeWait, setItemDone, updateItem } from "@/lib/items/data";
 import { isItemId, parseItemInput } from "@/lib/items/input";
 import { createProject } from "@/lib/projects/data";
-import { parseProjectInput } from "@/lib/projects/input";
+import { isProjectId, parseProjectInput } from "@/lib/projects/input";
 import { currentTimeZone } from "@/lib/time-zone";
 
 // The add box and the edit form get a result back instead of a redirect, so they can keep
@@ -106,4 +106,13 @@ export async function removeWaitAction(id: string, waitsOn: string): Promise<voi
   if (!isItemId(id) || !isItemId(waitsOn)) redirect("/");
   const saved = await removeWait(id, waitsOn);
   redirect(saved.ok ? `/items/${id}` : `/items/${id}?error=wait-remove`);
+}
+
+// Spec P15: the Inbox's quick "assign to a project" control on each row.
+export async function assignItemAction(id: string, form: FormData): Promise<void> {
+  const project = text(form, "project");
+  if (!isItemId(id) || !isProjectId(project)) redirect("/inbox?error=assign-pick");
+  const moved = await moveItem(id, project);
+  if (!moved.ok) redirect("/inbox?error=assign");
+  refresh();
 }

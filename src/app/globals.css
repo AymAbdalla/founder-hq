@@ -399,3 +399,65 @@ svg.status .bars { stroke: var(--text-3); stroke-width: 1.5; stroke-linecap: rou
 .pname > span { min-width: 0; }
 .chip-select, .wait-add select, .field select { text-overflow: ellipsis; }
 .wait-add select { min-width: 0; flex: 1 1 200px; }
+
+/* Views (slice 8): done-work grid, 7-day strips, Everything filters, Inbox move, skip link */
+.skip { position: absolute; left: 12px; top: -48px; z-index: 20; background: var(--ground); color: var(--text); border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 12px; font-weight: 550; }
+.skip:focus { top: 12px; outline: 2px solid var(--focus); outline-offset: 2px; }
+main.page:focus { outline: none; }
+
+.activity { margin-bottom: 24px; }
+.activity-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 10px; }
+.activity-head .total { font-weight: 600; }
+.activity-head .meta { color: var(--text-3); font-size: 13px; }
+.heat-wrap { --cell: 12px; --gap: 3px; display: grid; grid-template-columns: 26px max-content; column-gap: 6px; overflow-x: auto; scrollbar-width: thin; padding: 3px 4px 6px 0; }
+.heat-corner { position: sticky; left: 0; z-index: 2; background: var(--ground); }
+.heat-months { grid-column: 2; display: grid; grid-auto-flow: column; grid-auto-columns: var(--cell); column-gap: var(--gap); height: 16px; font-size: 11px; color: var(--text-3); }
+.heat-months span { white-space: nowrap; overflow: visible; }
+.heat-days { display: grid; grid-template-rows: repeat(7, var(--cell)); row-gap: var(--gap); font-size: 10px; color: var(--text-3); line-height: var(--cell); position: sticky; left: 0; z-index: 1; background: var(--ground); }
+.heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, var(--cell)); grid-auto-columns: var(--cell); gap: var(--gap); width: max-content; }
+.cell { display: block; width: var(--cell, 12px); height: var(--cell, 12px); border-radius: 2px; background: var(--c0); }
+.cell[data-l="1"] { background: var(--c1); }
+.cell[data-l="2"] { background: var(--c2); }
+.cell[data-l="3"] { background: var(--c3); }
+.cell[data-l="4"] { background: var(--c4); }
+.cell.future { visibility: hidden; }
+.cell[data-today] { outline: 1.5px solid var(--text); outline-offset: 1px; }
+.activity-foot { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px 16px; margin-top: 8px; font-size: 12px; color: var(--text-3); }
+.legend { margin-left: auto; display: flex; align-items: center; gap: 3px; --cell: 10px; }
+.legend .t { margin: 0 4px; }
+details.numbers summary { cursor: pointer; color: var(--text-2); }
+details.numbers summary:hover { color: var(--text); }
+details.numbers table { margin-top: 8px; border-collapse: collapse; font-size: 13px; }
+details.numbers th, details.numbers td { text-align: right; padding: 3px 14px 3px 0; border-bottom: 1px solid var(--line); }
+details.numbers th:first-child, details.numbers td:first-child { text-align: left; }
+details.numbers th { font-weight: 500; color: var(--text-3); }
+
+.strip { display: inline-grid; grid-auto-flow: column; gap: 2px; --cell: 9px; vertical-align: middle; }
+.ptable .num { text-align: right; width: 56px; }
+.ptable .c-next { max-width: 260px; }
+.ptable .c-next a { color: var(--text-2); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ptable .c-next a:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.ptable td.c-latest { max-width: 220px; font-size: 13px; color: var(--text-2); }
+.ptable .c-latest .latest-title { display: inline-block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.ptable .c-week { width: 84px; text-align: right; white-space: nowrap; }
+.ptable th.num, .ptable th.c-week { text-align: right; }
+
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px; }
+.filters .search { margin-left: 0; flex: 1 1 220px; height: 30px; }
+.filters .search input { width: 100%; }
+
+.assign { display: inline-flex; gap: 6px; align-items: center; }
+.assign select { max-width: 160px; }
+
+@media (max-width: 1024px) {
+  .ptable .c-latest { display: none; }
+}
+@media (max-width: 760px) {
+  .heat-wrap { --cell: 11px; --gap: 3px; }
+  .ptable th:nth-child(2), .ptable td:nth-child(2) { display: none; }
+  .ptable .c-next { display: none; }
+  .filters > * { flex: 1 1 calc(50% - 8px); }
+  .filters .search { flex-basis: 100%; }
+  .assign { padding-left: 30px; width: 100%; }
+  .assign select { flex: 1; max-width: none; }
+}

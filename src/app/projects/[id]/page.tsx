@@ -2,11 +2,13 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { AddItem } from "@/components/add-item";
 import { AppFrame } from "@/components/app-frame";
+import { DoneGrid } from "@/components/done-grid";
 import { ItemGroup, pickerProjects } from "@/components/items";
 import { STATUS_LABEL, StatusMark, ProjectNotFound, loadProject, shortDate } from "@/components/projects";
 import { requireSignedIn } from "@/components/signed-in";
-import { listItems } from "@/lib/items/data";
-import { currentToday, hoursAgo } from "@/lib/time-zone";
+import { listDone, listItems } from "@/lib/items/data";
+import { currentTimeZone, hoursAgo } from "@/lib/time-zone";
+import { todayIn } from "@/lib/dates";
 import { setStatusAction } from "../actions";
 
 const ERRORS: Record<string, string> = {
@@ -34,12 +36,15 @@ export default async function ProjectPage({
 
   const message = error && Object.hasOwn(ERRORS, error) ? ERRORS[error] : null;
   const since = hoursAgo(RECENT_DAYS * 24);
-  const [open, recent, projects, today] = await Promise.all([
+  const zone = await currentTimeZone();
+  const today = todayIn(zone);
+  const [open, recent, projects, done] = await Promise.all([
     listItems({ project: project.id, open: true }),
     listItems({ project: project.id, doneSince: since }),
     pickerProjects(),
-    currentToday(),
+    listDone(hoursAgo(27 * 7 * 24)),
   ]);
+  const doneHere = done.ok ? done.value.filter((d) => d.project_id === project.id).map((d) => d.done_at) : [];
   const openItems = open.ok ? open.value : [];
   const of = (...kinds: string[]) => openItems.filter((i) => kinds.includes(i.kind));
   const finished = (recent.ok ? recent.value : []).sort((a, b) => (b.done_at ?? "").localeCompare(a.done_at ?? "")).slice(0, 20);
@@ -75,6 +80,7 @@ export default async function ProjectPage({
         <Link href={`/projects/${project.id}/delete`} className="btn btn-small btn-quiet-danger">Delete</Link>
       </div>
 
+      <DoneGrid doneAts={doneHere} timeZone={zone} today={today} weeks={26} span="the last 26 weeks" />
       {project.status !== "archived" ? (
         <AddItem projects={projects} defaultProject={project.id} />
       ) : (

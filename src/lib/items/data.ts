@@ -114,6 +114,24 @@ export async function listItems(filter: ItemFilter = {}): Promise<ItemResult<Ite
   return { ok: true, value: rows.map((r) => shape(r, waits.map.get(r.id) ?? [])) };
 }
 
+export type DoneEntry = { id: string; project_id: string | null; title: string; done_at: string };
+
+// Every item ticked done at or after `since`, newest first, across all pages.
+export async function listDone(since: string): Promise<ItemResult<DoneEntry[]>> {
+  const db = await createSupabaseServerClient();
+  const { data, error } = await allRows<DoneEntry>((from, to) =>
+    db
+      .from("items")
+      .select("id, project_id, title, done_at")
+      .gte("done_at", since)
+      .order("done_at", { ascending: false })
+      .order("id", { ascending: true })
+      .range(from, to),
+  );
+  if (error) return failure("list_done", error);
+  return { ok: true, value: data };
+}
+
 export async function getItem(id: string): Promise<ItemResult<Item | null>> {
   const db = await createSupabaseServerClient();
   const { data, error } = await db.from("items").select(COLUMNS).eq("id", id).maybeSingle();
@@ -196,5 +214,19 @@ export async function removeWait(itemId: string, waitsOnId: string): Promise<Ite
   const db = await createSupabaseServerClient();
   const { error } = await db.from("item_waits").delete().eq("item_id", itemId).eq("waits_on_id", waitsOnId);
   if (error) return failure("remove_wait", error);
+  return { ok: true, value: null };
+}
+
+// Moves an item to a project (or the Inbox with null), without touching its other fields.
+export async function moveItem(id: string, projectId: string | null): Promise<ItemResult<null>> {
+  const db = await createSupabaseServerClient();
+  const current = await db.from("items").select("project_id").eq("id", id).maybeSingle();
+  if (current.error) return failure("move", current.error);
+  if (!current.data) return { ok: false, message: MISSING_ITEM };
+  const refused = await checkProject(projectId, current.data.project_id);
+  if (refused) return refused;
+  const { data, error } = await db.from("items").update({ project_id: projectId }).eq("id", id).select("id");
+  if (error) return failure("move", error);
+  if (!data || data.length === 0) return { ok: false, message: MISSING_ITEM };
   return { ok: true, value: null };
 }
