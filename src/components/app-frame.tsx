@@ -3,6 +3,7 @@ import { signOut } from "@/app/actions";
 import { listProjects } from "@/lib/projects/data";
 import { Brand, Icon, type IconName } from "./icons";
 import { ThemeSwitch } from "./theme-switch";
+import { TimeZoneSync } from "./time-zone-sync";
 
 export const VIEWS: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Today", icon: "today" },
@@ -74,6 +75,7 @@ export async function AppFrame({ current, project, children }: { current: string
       <nav className="tabbar" aria-label="Main">
         <NavLinks current={current} />
       </nav>
+      <TimeZoneSync />
     </div>
   );
 }

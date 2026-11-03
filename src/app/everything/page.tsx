@@ -9,7 +9,7 @@ export default async function EverythingPage() {
   await requireSignedIn();
   return (
     <PlaceholderView current="/everything" title="Everything">
-      Everything arrives with items (step 6 and 8).
+      Everything arrives in step 8, with search and filters over all your items.
     </PlaceholderView>
   );
 }

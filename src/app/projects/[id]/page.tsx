@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { AddItem } from "@/components/add-item";
 import { AppFrame } from "@/components/app-frame";
+import { ItemGroup, pickerProjects } from "@/components/items";
 import { STATUS_LABEL, StatusMark, ProjectNotFound, loadProject, shortDate } from "@/components/projects";
 import { requireSignedIn } from "@/components/signed-in";
+import { listItems } from "@/lib/items/data";
+import { currentToday, hoursAgo } from "@/lib/time-zone";
 import { setStatusAction } from "../actions";
 
 const ERRORS: Record<string, string> = {
@@ -10,8 +14,10 @@ const ERRORS: Record<string, string> = {
   delete: "Couldn't delete the project. Try again.",
 };
 
-// Spec P9: the project's own page. To-dos, ideas and features arrive with items (slice 6);
-// repo facts and plans only appear once a repo is linked (slice 11), never as empty fields.
+// Spec P9: the project's own page: open to-dos and reminders, features, ideas, recently
+// finished items and notes. Repo facts and plans only appear once a repo is linked
+// (slice 11), never as empty fields.
+const RECENT_DAYS = 14;
 export default async function ProjectPage({
   params,
   searchParams,
@@ -27,6 +33,16 @@ export default async function ProjectPage({
   if (!project) return <ProjectNotFound failed={failed} />;
 
   const message = error && Object.hasOwn(ERRORS, error) ? ERRORS[error] : null;
+  const since = hoursAgo(RECENT_DAYS * 24);
+  const [open, recent, projects, today] = await Promise.all([
+    listItems({ project: project.id, open: true }),
+    listItems({ project: project.id, doneSince: since }),
+    pickerProjects(),
+    currentToday(),
+  ]);
+  const openItems = open.ok ? open.value : [];
+  const of = (...kinds: string[]) => openItems.filter((i) => kinds.includes(i.kind));
+  const finished = (recent.ok ? recent.value : []).sort((a, b) => (b.done_at ?? "").localeCompare(a.done_at ?? "")).slice(0, 20);
   const statusButton = (status: string, label: string) => (
     <form action={setStatusAction.bind(null, project.id, status)}>
       <button type="submit" className="btn btn-small">{label}</button>
@@ -58,6 +74,21 @@ export default async function ProjectPage({
         {project.status === "archived" && statusButton("active", "Reopen")}
         <Link href={`/projects/${project.id}/delete`} className="btn btn-small btn-quiet-danger">Delete</Link>
       </div>
+
+      {project.status !== "archived" ? (
+        <AddItem projects={projects} defaultProject={project.id} />
+      ) : (
+        <p className="muted">This project is archived. Reopen it to add items.</p>
+      )}
+      {!open.ok && (
+        <p role="alert" className="alert">
+          Couldn&apos;t load this project&apos;s items. Try again in a moment.
+        </p>
+      )}
+      <ItemGroup title="To-dos and reminders" items={of("todo", "reminder")} today={today} hideProject empty="No open to-dos. Add the next step above." />
+      <ItemGroup title="Features" items={of("feature")} today={today} hideProject />
+      <ItemGroup title="Ideas" items={of("idea")} today={today} hideProject />
+      <ItemGroup title="Recently done" items={finished} today={today} hideProject />
 
       <h2>Notes</h2>
       {project.notes ? <p className="notes">{project.notes}</p> : <p className="empty-row">No notes. Use Edit to add some.</p>}

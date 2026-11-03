@@ -39,8 +39,11 @@ export async function setStatusAction(id: string, status: string): Promise<void>
   redirect(saved.ok ? `/projects/${id}` : `/projects/${id}?error=status`);
 }
 
-export async function deleteProjectAction(id: string): Promise<void> {
+// Spec P8: the delete page asks whether the project's items move to the Inbox (the default)
+// or are deleted too.
+export async function deleteProjectAction(id: string, form: FormData): Promise<void> {
   if (!isProjectId(id)) redirect("/projects");
-  const deleted = await deleteProject(id);
+  const keepItems = form.get("items") !== "delete";
+  const deleted = await deleteProject(id, keepItems);
   redirect(deleted.ok ? "/projects" : `/projects/${id}?error=delete`);
 }

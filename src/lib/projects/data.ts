@@ -64,10 +64,18 @@ export async function setProjectStatus(id: string, status: ProjectStatus): Promi
   return { ok: true, value: data as Project };
 }
 
-// Slice 6 adds items; then deleting a project will also move its items to the Inbox (spec P8).
-export async function deleteProject(id: string): Promise<ProjectResult<null>> {
+// Deletes a project. With keepItems its items move to the Inbox; otherwise they are deleted too (spec P8).
+export async function deleteProject(id: string, keepItems: boolean): Promise<ProjectResult<null>> {
   const db = await createSupabaseServerClient();
-  const { error } = await db.from("projects").delete().eq("id", id);
+  const { data, error } = await db.rpc("delete_project", { target: id, keep_items: keepItems });
   if (error) return failure("delete", error);
+  if (data !== true) return { ok: false, message: "That project doesn't exist." };
   return { ok: true, value: null };
+}
+
+export async function countProjectItems(id: string): Promise<ProjectResult<number>> {
+  const db = await createSupabaseServerClient();
+  const { count, error } = await db.from("items").select("id", { count: "exact", head: true }).eq("project_id", id);
+  if (error) return failure("count_items", error);
+  return { ok: true, value: count ?? 0 };
 }

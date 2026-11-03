@@ -92,3 +92,29 @@ describe("project changes", () => {
     expect(data).toEqual([]);
   });
 });
+
+describe("deleting a project with items (spec P8)", () => {
+  it("moves the items to the Inbox when they are kept", async () => {
+    const { data: project } = await add(a, { name: "Has items, keep" });
+    const { data: item } = await a.db.from("items").insert({ title: "Stays", project_id: project!.id }).select("id").single();
+    const r = await a.db.rpc("delete_project", { target: project!.id, keep_items: true });
+    expect(r.data).toBe(true);
+    const { data } = await a.db.from("items").select("project_id").eq("id", item!.id).single();
+    expect(data!.project_id).toBeNull();
+  });
+
+  it("deletes the items when they are not kept", async () => {
+    const { data: project } = await add(a, { name: "Has items, drop" });
+    const { data: item } = await a.db.from("items").insert({ title: "Goes", project_id: project!.id }).select("id").single();
+    const r = await a.db.rpc("delete_project", { target: project!.id, keep_items: false });
+    expect(r.data).toBe(true);
+    expect((await a.db.from("items").select("id").eq("id", item!.id)).data).toEqual([]);
+  });
+
+  it("counts a project's items", async () => {
+    const { data: project } = await add(a, { name: "Counted" });
+    await a.db.from("items").insert([{ title: "1", project_id: project!.id }, { title: "2", project_id: project!.id }]);
+    const { count } = await a.db.from("items").select("id", { count: "exact", head: true }).eq("project_id", project!.id);
+    expect(count).toBe(2);
+  });
+});
