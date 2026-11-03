@@ -42,7 +42,7 @@ export default async function ProjectPage({
     listItems({ project: project.id, open: true }),
     listItems({ project: project.id, doneSince: since }),
     pickerProjects(),
-    listDone(hoursAgo(27 * 7 * 24)),
+    listDone(hoursAgo(54 * 7 * 24)),
   ]);
   const doneHere = done.ok ? done.value.filter((d) => d.project_id === project.id).map((d) => d.done_at) : [];
   const openItems = open.ok ? open.value : [];
@@ -80,7 +80,7 @@ export default async function ProjectPage({
         <Link href={`/projects/${project.id}/delete`} className="btn btn-small btn-quiet-danger">Delete</Link>
       </div>
 
-      <DoneGrid doneAts={doneHere} timeZone={zone} today={today} weeks={26} span="the last 26 weeks" />
+      <DoneGrid doneAts={doneHere} timeZone={zone} today={today} weeks={53} span="the last year" />
       {project.status !== "archived" ? (
         <AddItem projects={projects} defaultProject={project.id} />
       ) : (

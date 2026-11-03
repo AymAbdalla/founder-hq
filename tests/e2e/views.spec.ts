@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { localSql, sqlText } from "../support/db";
 import { signInNewAccount } from "../support/session";
 
 // Plan slice 8: the views. Spec 3.4 (done-work grid), P14 to P20; checks 5, 13 (Everything
@@ -163,7 +164,7 @@ test("ticking items done fills today's square, the year count and the numbers (c
     if (!(await numbers.evaluate((d) => (d as HTMLDetailsElement).open))) await grid.getByText("Show as numbers").click();
   };
   await openNumbers();
-  await expect(monthRow.getByRole("cell").last()).toHaveText("1");
+  await expect(monthRow.getByRole("cell").nth(1)).toHaveText("1");
 
   await page.getByRole("checkbox", { name: "Done: Edit episode one" }).check();
   await page.getByRole("checkbox", { name: "Done: Upload the trailer" }).check();
@@ -171,10 +172,33 @@ test("ticking items done fills today's square, the year count and the numbers (c
   await expect(square).toHaveAttribute("data-l", "2");
   await expect(grid.getByRole("img")).toHaveAttribute("aria-label", /3 done in the last year\. Today: 3\./);
   await openNumbers();
-  await expect(monthRow.getByRole("cell").last()).toHaveText("3");
+  await expect(monthRow.getByRole("cell").nth(1)).toHaveText("3");
 
-  await page.getByRole("navigation", { name: "Your projects" }).getByRole("link", { name: "Little Radio" }).click();
-  await expect(page.getByRole("region", { name: "Done work" })).toContainText("3 done in the last 26 weeks");
+  // The text version names each day and its count, not only the month (spec P20; check S8-F2).
+  const dayLabel = new Date(`${today}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  await expect(monthRow).toContainText(`${dayLabel}: 3`);
+  await expect(grid.getByText("Days not listed had nothing done.")).toBeVisible();
+});
+
+test("a project's grid covers the whole year, and its 7-day strip names each day (check S8-F1, S8-F2)", async ({ page }) => {
+  const email = await signInNewAccount(page, "views-project-year");
+  const projectPage = await newProject(page, "Little Radio");
+  const owner = `(select id from auth.users where email = ${sqlText(email)})`;
+  // Done 200 days ago: older than 26 weeks, inside the year.
+  localSql(`insert into public.items (account_id, project_id, title, done_at)
+    values (${owner}, (select id from public.projects where account_id = ${owner}), 'Pilot episode', now() - interval '200 days')`);
+  await addItem(page, { title: "Record the intro" });
+  await page.getByRole("checkbox", { name: "Done: Record the intro" }).check();
+  await expect(row(group(page, "Recently done"), "Record the intro")).toBeVisible();
+  await page.goto(projectPage);
+  await expect(page.getByRole("region", { name: "Done work" })).toContainText("2 done in the last year");
+
+  const today = await browserDate(page);
+  const dayLabel = new Date(`${today}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  await page.goto("/projects");
+  const strip = page.getByRole("table", { name: "Projects" }).getByRole("img", { name: /Last 7 days/ });
+  await expect(strip).toHaveAttribute("aria-label", new RegExp(`${dayLabel}: 1`));
+  await expect(strip).toHaveAttribute("aria-label", /(\w{3} \d{1,2}: \d+[,.] ?){7}/);
 });
 
 test("project rows show the next step, open items, latest done and the last 7 days", async ({ page }) => {
@@ -248,6 +272,7 @@ test("at 400px no view scrolls sideways, in light and dark mode (check 27)", asy
     await page.context().addCookies([{ name: "hq-theme", value: theme, url: "http://localhost:3100" }]);
     for (const path of ["/", "/inbox", "/projects", "/everything", "/everything?status=done"]) {
       await page.goto(path);
+      if (path === "/") await page.getByText("Show as numbers").click();
       const width = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(width, `${theme} ${path}`).toBeLessThanOrEqual(400);
     }
