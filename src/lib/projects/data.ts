@@ -1,5 +1,6 @@
 import "server-only";
 import { logEvent } from "@/lib/log";
+import { allRows } from "@/lib/supabase/all-rows";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ProjectFields, ProjectInput, ProjectStatus } from "./input";
 
@@ -29,9 +30,11 @@ function failure(action: string, error: { code?: string }): { ok: false; message
 
 export async function listProjects(status?: ProjectStatus): Promise<ProjectResult<Project[]>> {
   const db = await createSupabaseServerClient();
-  let query = db.from("projects").select(COLUMNS).order("created_at", { ascending: true });
-  if (status) query = query.eq("status", status);
-  const { data, error } = await query;
+  const { data, error } = await allRows((from, to) => {
+    let query = db.from("projects").select(COLUMNS);
+    if (status) query = query.eq("status", status);
+    return query.order("created_at", { ascending: true }).order("id", { ascending: true }).range(from, to);
+  });
   if (error) return failure("list", error);
   return { ok: true, value: data as Project[] };
 }

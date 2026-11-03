@@ -2,6 +2,7 @@ import "server-only";
 import { logEvent } from "@/lib/log";
 import { getProject } from "@/lib/projects/data";
 import type { ProjectStatus } from "@/lib/projects/input";
+import { allRows } from "@/lib/supabase/all-rows";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ItemInput, ItemKind } from "./input";
 import { isWaiting } from "./views";
@@ -64,9 +65,11 @@ async function loadWaits(db: Db, ids: string[]): Promise<{ map: Map<string, Wait
   if (ids.length === 0) return { map };
   const links: { item_id: string; waits_on_id: string }[] = [];
   for (const part of chunks(ids)) {
-    const { data, error } = await db.from("item_waits").select("item_id, waits_on_id").in("item_id", part);
+    const { data, error } = await allRows<{ item_id: string; waits_on_id: string }>((from, to) =>
+      db.from("item_waits").select("item_id, waits_on_id").in("item_id", part).order("item_id").order("waits_on_id").range(from, to),
+    );
     if (error) return { error };
-    links.push(...(data ?? []));
+    links.push(...data);
   }
   if (links.length === 0) return { map };
   const blockerIds = [...new Set(links.map((l) => l.waits_on_id))];
@@ -89,18 +92,23 @@ async function loadWaits(db: Db, ids: string[]): Promise<{ map: Map<string, Wait
 
 export async function listItems(filter: ItemFilter = {}): Promise<ItemResult<Item[]>> {
   const db = await createSupabaseServerClient();
-  let query = db.from("items").select(COLUMNS);
-  if (filter.project) query = query.eq("project_id", filter.project);
-  if (filter.inbox) query = query.is("project_id", null);
-  if (filter.open) query = query.is("done_at", null);
-  if (filter.doneSince) query = query.gte("done_at", filter.doneSince);
-  query = query
-    .order("due_date", { ascending: true, nullsFirst: false })
-    .order("due_time", { ascending: true, nullsFirst: false })
-    .order("created_at", { ascending: true });
-  const { data, error } = await query;
+  const page = (from: number, to: number) => {
+    let query = db.from("items").select(COLUMNS);
+    if (filter.project) query = query.eq("project_id", filter.project);
+    if (filter.inbox) query = query.is("project_id", null);
+    if (filter.open) query = query.is("done_at", null);
+    if (filter.doneSince) query = query.gte("done_at", filter.doneSince);
+    // The id comes last so every page has the same order and no row is skipped or repeated.
+    return query
+      .order("due_date", { ascending: true, nullsFirst: false })
+      .order("due_time", { ascending: true, nullsFirst: false })
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, to);
+  };
+  const { data, error } = await allRows(page);
   if (error) return failure("list", error);
-  const rows = (data ?? []) as unknown as Row[];
+  const rows = data as unknown as Row[];
   const waits = await loadWaits(db, rows.map((r) => r.id));
   if ("error" in waits) return failure("list_waits", waits.error);
   return { ok: true, value: rows.map((r) => shape(r, waits.map.get(r.id) ?? [])) };
