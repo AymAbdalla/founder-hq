@@ -20,7 +20,7 @@
     "check:build-secrets": "node scripts/check-build-secrets.mjs",
     "check": "npm run lint && npm run typecheck && npm run test && npm run secrets && npm run audit && npm run build:canary && npm run check:build-secrets && npm run test:e2e",
     "build:canary": "SUPABASE_SERVICE_ROLE_KEY=canary-service-role-key-7f3a9c next build",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

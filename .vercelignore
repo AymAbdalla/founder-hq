@@ -1,0 +1,15 @@
+# Never uploaded to Vercel. reference/ is the old personal page (personal data, never shipped);
+# .env files and supabase/.env hold local secrets; tests and local tool output are not needed.
+reference/
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/.temp/
+supabase/.branches/
+tests/
+test-results/
+playwright-report/
+.next/
+node_modules/
+docs/agents/
