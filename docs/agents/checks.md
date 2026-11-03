@@ -20,6 +20,7 @@ Written only by an independent checker, in a commit that changes this file and n
 | security | 3a03777 | pass | Scoped independent security review of slice-8 changes and their auth/data/action callers; existing security, access-isolation, forged-request, lint, log-redaction, secret and build-leak checks passed in npm run check. Added browser probe: forged assignment to a second account's real project was refused, original item stayed in Inbox, foreign project query returned zero rows. Audit: shipped 0 vulnerabilities; development 16 moderate, none high/critical. | No confirmed security findings in this scope. No package, migration, permission or integration expansion in slice 8. This is not a whole-system penetration test or hosted-settings check. | independent fresh chat | 2026-11-03 |
 | 8 | 87d2448 | fail | Recheck: npm run check exit 0, 200 unit/integration and 81 production Chromium cases, no skips. Original independent fixture now shows 5 yearly completions on both Today and the project; expanded text tables expose Mar 28: 1, Nov 2: 1 and Nov 3: 3, and the strip exposes all seven daily counts. All 12 expanded-table phone measurements stayed at 400px. S8-F1/F2 resolved; no new code findings. | S8-F3 remains unverified directly: build.md:19 records Aym's successful manual VoiceOver report with the quote All worked, but the builder did not observe it. Direct confirmation was requested in this recheck and is still pending. This is an evidence gap, not a reproduced VoiceOver failure. | independent fresh chat | 2026-11-03 |
 | security | 87d2448 | pass | Scoped security recheck of the four-file fix diff and relevant data/auth callers; full security/isolation/forged-request/log/lint/secret/build-leak checks passed. Original forged-assignment probe again refused a foreign project ID, kept the item in Inbox and returned zero foreign project rows. Audit shipped 0 vulnerabilities; development 16 moderate, none high/critical. | No new security findings. No dependency, migration, permission, auth or integration changes in this fix. | independent fresh chat | 2026-11-03 |
+| 8 | 87d2448 | pass | Final disposition of round 2: S8-F1/F2 resolved by the fresh 200 unit/integration, 81 production browser cases and original independent probes recorded below. Aym directly confirmed in this check chat: Yes, I completed it successfully, in response to whether adding an item with VoiceOver enabled succeeded. S8-F3 is now closed by the designated manual tester's direct attestation. | No remaining slice-8 acceptance findings. Manual result is user-attested, not observed by this checker; the current scoped security pass at 87d2448 remains in force. Earlier pending/fail rows are preserved as history. | independent fresh chat | 2026-11-03 |
 
 ## Independent verification — 2026-11-02, round 1
 
@@ -189,4 +190,20 @@ refused: 6 problem(s)
 - slice 5: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
 - slice 6: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
 - slice 8: latest check result is 'fail', not pass
+```
+
+
+### Round-2 final disposition — direct manual confirmation received
+
+After the pending-evidence record above was committed, Aym directly answered this check's question about personally adding an item with VoiceOver enabled and succeeding: **"Yes, I completed it successfully"**. This is the required designated tester's direct attestation, rather than reliance on the builder's quoted report. S8-F3 is now **verified by direct user attestation**, with the clear limit that this checker did not personally observe VoiceOver. S8-F1, S8-F2 and S8-F3 are closed; **slice 8 passes at `87d2448`**, with no remaining code or security findings in this scope. No source changed between the automated/probe run and this confirmation, so those results remain current; no repeat execution was needed. The preceding pending failure is retained as history, superseded by the new pass row. Only this file was edited.
+
+The branch gate still refuses the five earlier stale slice passes; this scope did not renew those earlier slices. Final gate, exit 1:
+
+```text
+refused: 5 problem(s)
+- slice 1: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
+- slice 2: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
+- slice 2b: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
+- slice 5: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
+- slice 6: pass is stale: it checked 270dde1, but the latest code commit is 87d2448
 ```
