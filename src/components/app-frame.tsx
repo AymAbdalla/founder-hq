@@ -22,6 +22,14 @@ function NavLinks({ current }: { current: string }) {
   ));
 }
 
+function NotificationsLink({ current }: { current: string }) {
+  return (
+    <Link href="/notifications" className="icon-btn" aria-label="Notifications" title="Notifications" aria-current={current === "/notifications" ? "page" : undefined}>
+      <Icon name="bell" />
+    </Link>
+  );
+}
+
 function SignOut() {
   return (
     <form action={signOut}>
@@ -60,6 +68,7 @@ export async function AppFrame({ current, project, children }: { current: string
         )}
         <div className="rail-foot">
           <div className="foot-actions">
+            <NotificationsLink current={current} />
             <ThemeSwitch />
             <SignOut />
           </div>
@@ -69,6 +78,7 @@ export async function AppFrame({ current, project, children }: { current: string
         <header className="topbar">
           <Brand />
           <div className="foot-actions">
+            <NotificationsLink current={current} />
             <ThemeSwitch />
             <SignOut />
           </div>

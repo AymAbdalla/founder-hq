@@ -42,3 +42,12 @@ export async function allowSignInEvent(kind: SignInEvent, email: string): Promis
   if (error) return { answer: null, failed: true };
   return { answer: typeof data === "string" ? data : null, failed: false };
 }
+
+// Plan slice 3: the every-minute notification job. Taking due test notifications off the queue
+// is a system task with no account yet, like the sign-in limits above; it reads only the queue's
+// ids and owners. Everything after that runs per account through adminForAccount.
+export async function claimDueTestNotifications(limit: number): Promise<{ id: string; account_id: string }[]> {
+  const { data, error } = await masterClient().rpc("claim_due_test_notifications", { p_limit: limit });
+  if (error) throw new Error(`claim failed: ${error.code ?? "unknown"}`);
+  return (data ?? []) as { id: string; account_id: string }[];
+}

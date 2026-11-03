@@ -8,6 +8,9 @@ export function buildContentSecurityPolicy(nonce: string, isDev: boolean): strin
     "img-src 'self' blob: data:",
     "font-src 'self'",
     "connect-src 'self'",
+    // The notification service worker (public/sw.js) and the install manifest come from HQ itself.
+    "worker-src 'self'",
+    "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
