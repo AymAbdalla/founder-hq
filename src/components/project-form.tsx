@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
-import type { SaveResult } from "@/app/projects/actions";
+import type { SaveResult } from "@/app/(hq)/projects/actions";
 import { KIND_MAX, NAME_MAX, NOTES_MAX, SUMMARY_MAX } from "@/lib/projects/input";
 
 type Values = { name: string; kind: string; summary: string; notes: string };
@@ -81,9 +81,9 @@ export function ProjectForm({
         <button type="submit" className="btn btn-primary" disabled={pending}>
           {submitLabel}
         </button>
-        <Link href={cancelHref} className="btn">
+        <AppLink href={cancelHref} className="btn">
           Cancel
-        </Link>
+        </AppLink>
       </div>
     </form>
   );

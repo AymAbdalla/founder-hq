@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { addDays } from "@/lib/dates";
 import { getItem, isWaiting, type Item } from "@/lib/items/data";
 import { KIND_LABEL, isItemId } from "@/lib/items/input";
@@ -59,9 +59,9 @@ export function ItemRow({
     <li className={done ? "row done" : "row"}>
       <ItemCheck id={item.id} title={item.title} done={done} />
       <span className="row-main">
-        <Link className="title" href={`/items/${item.id}`}>
+        <AppLink className="title" href={`/items/${item.id}`}>
           {item.title}
-        </Link>
+        </AppLink>
         {!done && isWaiting(item) && (
           <span className="waiting">
             <Icon name="wait" />
@@ -76,9 +76,9 @@ export function ItemRow({
         </span>
       )}
       {item.project && !hideProject && (
-        <Link className="proj" href={`/projects/${item.project.id}`}>
+        <AppLink className="proj" href={`/projects/${item.project.id}`}>
           {item.project.name}
-        </Link>
+        </AppLink>
       )}
       <span className={`due ${due.tone}`.trim()}>{due.text}</span>
       {extra}
@@ -137,7 +137,7 @@ export function ItemNotFound({ failed }: { failed: boolean }) {
         <h1>{failed ? "Couldn't load the item" : "Item not found"}</h1>
       </div>
       <p className="lede">
-        {failed ? "Try again in a moment." : "It may have been deleted, or the address is wrong."} <Link href="/">Back to Today</Link>
+        {failed ? "Try again in a moment." : "It may have been deleted, or the address is wrong."} <AppLink href="/">Back to Today</AppLink>
       </p>
     </AppFrame>
   );

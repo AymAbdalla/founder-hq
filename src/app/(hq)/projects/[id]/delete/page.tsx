@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { connection } from "next/server";
 import { AppFrame } from "@/components/app-frame";
 import { ProjectNotFound, loadProject } from "@/components/projects";
@@ -41,7 +41,7 @@ export default async function DeleteProjectPage({ params }: { params: Promise<{ 
         )}
         <div className="actions">
           <button type="submit" className="btn btn-danger">Delete project</button>
-          <Link href={`/projects/${project.id}`} className="btn">Cancel</Link>
+          <AppLink href={`/projects/${project.id}`} className="btn">Cancel</AppLink>
         </div>
       </form>
     </AppFrame>

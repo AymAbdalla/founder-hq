@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { getProject, type Project } from "@/lib/projects/data";
 import { isProjectId, type ProjectStatus } from "@/lib/projects/input";
 import { AppFrame } from "./app-frame";
@@ -36,7 +36,7 @@ export function ProjectNotFound({ failed }: { failed: boolean }) {
       </div>
       <p className="lede">
         {failed ? "Try again in a moment." : "It may have been deleted, or the address is wrong."}{" "}
-        <Link href="/projects">Back to projects</Link>
+        <AppLink href="/projects">Back to projects</AppLink>
       </p>
     </AppFrame>
   );

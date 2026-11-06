@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { createItemAction } from "@/app/items/actions";
+import { createItemAction } from "@/app/(hq)/items/actions";
 import { ITEM_KINDS, KIND_LABEL, TITLE_MAX, type ItemKind } from "@/lib/items/input";
 import { NAME_MAX } from "@/lib/projects/input";
 import { Icon } from "./icons";

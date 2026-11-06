@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { savePushSubscriptionAction, scheduleTestAction } from "@/app/notifications/actions";
+import { savePushSubscriptionAction, scheduleTestAction } from "@/app/(hq)/notifications/actions";
 
 type DeviceState = "checking" | "unsupported" | "iphone-browser" | "blocked" | "off" | "on";
 

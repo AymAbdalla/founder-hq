@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { connection } from "next/server";
 import { AppFrame } from "@/components/app-frame";
 import { ItemForm } from "@/components/item-form";
@@ -47,7 +47,7 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
   return (
     <AppFrame current={item.project ? "/projects" : "/inbox"} project={item.project?.id}>
       <nav className="crumbs" aria-label="Breadcrumb">
-        {item.project ? <Link href={`/projects/${item.project.id}`}>{item.project.name}</Link> : <Link href="/inbox">Inbox</Link>} / <span>{KIND_LABEL[item.kind]}</span>
+        {item.project ? <AppLink href={`/projects/${item.project.id}`}>{item.project.name}</AppLink> : <AppLink href="/inbox">Inbox</AppLink>} / <span>{KIND_LABEL[item.kind]}</span>
       </nav>
       <div className="page-head item-head">
         <h1>{item.title}</h1>
@@ -69,9 +69,9 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
             {done ? "Reopen" : "Mark done"}
           </button>
         </form>
-        <Link href={`/items/${item.id}/delete`} className="btn btn-small btn-quiet-danger">
+        <AppLink href={`/items/${item.id}/delete`} className="btn btn-small btn-quiet-danger">
           Delete
-        </Link>
+        </AppLink>
       </div>
 
       <ItemForm
@@ -97,9 +97,9 @@ export default async function ItemPage({ params, searchParams }: { params: Promi
             {item.waitsOn.map((w) => (
               <li key={w.id} className={w.done ? "row done" : "row"}>
                 <span className="row-main">
-                  <Link className="title" href={`/items/${w.id}`}>
+                  <AppLink className="title" href={`/items/${w.id}`}>
                     {w.title}
-                  </Link>
+                  </AppLink>
                 </span>
                 <span className="due">{w.done ? "Done" : "Open"}</span>
                 <form action={removeWaitAction.bind(null, item.id, w.id)}>

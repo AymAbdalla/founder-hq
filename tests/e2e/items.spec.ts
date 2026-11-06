@@ -347,3 +347,25 @@ test("a longest-allowed item title and project name with no spaces fit a 400px s
     expect(width, path).toBeLessThanOrEqual(400);
   }
 });
+
+// The frame stays put between pages (it lives in the signed-in layout). An item page still
+// marks where the item lives: its project's tab and rail entry, or the Inbox.
+test("an item page marks the Projects tab and its project, or the Inbox", async ({ page }) => {
+  await signInNewAccount(page, "items-marks");
+  await newProject(page, "Seed Library");
+  await page.goto("/");
+  await addItem(page, { title: "Label the seed jars", project: "Seed Library" });
+  await addItem(page, { title: "Call the print shop" });
+  const tabs = page.getByRole("navigation", { name: "Main" }).first();
+
+  await page.getByRole("link", { name: "Label the seed jars" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Label the seed jars" })).toBeVisible();
+  await expect(tabs.getByRole("link", { name: "Projects" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("navigation", { name: "Your projects" }).getByRole("link", { name: "Seed Library" })).toHaveAttribute("aria-current", "page");
+
+  await page.goto("/");
+  await page.getByRole("link", { name: "Call the print shop" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Call the print shop" })).toBeVisible();
+  await expect(tabs.getByRole("link", { name: "Inbox" })).toHaveAttribute("aria-current", "page");
+  await expect(tabs.locator('[aria-current="page"]')).toHaveCount(1);
+});

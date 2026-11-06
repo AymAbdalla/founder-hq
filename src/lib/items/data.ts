@@ -59,32 +59,31 @@ function chunks<T>(list: T[]): T[][] {
 
 type Db = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 
-// Looks up what each listed item waits on: the links, then the titles and done state of the blockers.
-async function loadWaits(db: Db, ids: string[]): Promise<{ map: Map<string, WaitRef[]> } | { error: { code?: string } }> {
+type WaitRow = { item_id: string; blocker: { id: string; title: string; done_at: string | null } | null };
+
+// Looks up what items wait on, in one request per 1,000 links: each link comes with its
+// blocker's title and done state. With `ids`, only links from those items; without, every
+// link the account has, so a list can load its waits at the same time as its items.
+async function loadWaits(db: Db, ids?: string[]): Promise<{ map: Map<string, WaitRef[]> } | { error: { code?: string } }> {
   const map = new Map<string, WaitRef[]>();
-  if (ids.length === 0) return { map };
-  const links: { item_id: string; waits_on_id: string }[] = [];
-  for (const part of chunks(ids)) {
-    const { data, error } = await allRows<{ item_id: string; waits_on_id: string }>((from, to) =>
-      db.from("item_waits").select("item_id, waits_on_id").in("item_id", part).order("item_id").order("waits_on_id").range(from, to),
-    );
+  if (ids && ids.length === 0) return { map };
+  for (const part of ids ? chunks(ids) : [null]) {
+    const { data, error } = await allRows<WaitRow>((from, to) => {
+      let query = db.from("item_waits").select("item_id, blocker:items!waits_on_id(id, title, done_at)", { count: "exact" });
+      if (part) query = query.in("item_id", part);
+      return query.order("item_id").order("waits_on_id").range(from, to) as unknown as PromiseLike<{
+        data: WaitRow[] | null;
+        error: { code?: string } | null;
+        count: number | null;
+      }>;
+    });
     if (error) return { error };
-    links.push(...data);
-  }
-  if (links.length === 0) return { map };
-  const blockerIds = [...new Set(links.map((l) => l.waits_on_id))];
-  const blockers = new Map<string, WaitRef>();
-  for (const part of chunks(blockerIds)) {
-    const { data, error } = await db.from("items").select("id, title, done_at").in("id", part);
-    if (error) return { error };
-    for (const b of data ?? []) blockers.set(b.id, { id: b.id, title: b.title, done: b.done_at !== null });
-  }
-  for (const l of links) {
-    const ref = blockers.get(l.waits_on_id);
-    if (!ref) continue;
-    const list = map.get(l.item_id) ?? [];
-    list.push(ref);
-    map.set(l.item_id, list);
+    for (const link of data) {
+      if (!link.blocker) continue;
+      const list = map.get(link.item_id) ?? [];
+      list.push({ id: link.blocker.id, title: link.blocker.title, done: link.blocker.done_at !== null });
+      map.set(link.item_id, list);
+    }
   }
   for (const list of map.values()) list.sort((x, y) => x.title.localeCompare(y.title));
   return { map };
@@ -93,7 +92,7 @@ async function loadWaits(db: Db, ids: string[]): Promise<{ map: Map<string, Wait
 export async function listItems(filter: ItemFilter = {}): Promise<ItemResult<Item[]>> {
   const db = await createSupabaseServerClient();
   const page = (from: number, to: number) => {
-    let query = db.from("items").select(COLUMNS);
+    let query = db.from("items").select(COLUMNS, { count: "exact" });
     if (filter.project) query = query.eq("project_id", filter.project);
     if (filter.inbox) query = query.is("project_id", null);
     if (filter.open) query = query.is("done_at", null);
@@ -106,10 +105,10 @@ export async function listItems(filter: ItemFilter = {}): Promise<ItemResult<Ite
       .order("id", { ascending: true })
       .range(from, to);
   };
-  const { data, error } = await allRows(page);
+  // Items and every wait link at the same time: one trip to the database instead of two.
+  const [{ data, error }, waits] = await Promise.all([allRows(page), loadWaits(db)]);
   if (error) return failure("list", error);
   const rows = data as unknown as Row[];
-  const waits = await loadWaits(db, rows.map((r) => r.id));
   if ("error" in waits) return failure("list_waits", waits.error);
   return { ok: true, value: rows.map((r) => shape(r, waits.map.get(r.id) ?? [])) };
 }
@@ -122,7 +121,7 @@ export async function listDone(since: string): Promise<ItemResult<DoneEntry[]>> 
   const { data, error } = await allRows<DoneEntry>((from, to) =>
     db
       .from("items")
-      .select("id, project_id, title, done_at")
+      .select("id, project_id, title, done_at", { count: "exact" })
       .gte("done_at", since)
       .order("done_at", { ascending: false })
       .order("id", { ascending: true })
@@ -134,10 +133,11 @@ export async function listDone(since: string): Promise<ItemResult<DoneEntry[]>> 
 
 export async function getItem(id: string): Promise<ItemResult<Item | null>> {
   const db = await createSupabaseServerClient();
-  const { data, error } = await db.from("items").select(COLUMNS).eq("id", id).maybeSingle();
+  // The item and its wait links at the same time. Another account's item id finds no links,
+  // because row-level security hides them, and the item itself comes back empty.
+  const [{ data, error }, waits] = await Promise.all([db.from("items").select(COLUMNS).eq("id", id).maybeSingle(), loadWaits(db, [id])]);
   if (error) return failure("get", error);
   if (!data) return { ok: true, value: null };
-  const waits = await loadWaits(db, [id]);
   if ("error" in waits) return failure("get_waits", waits.error);
   return { ok: true, value: shape(data as unknown as Row, waits.map.get(id) ?? []) };
 }

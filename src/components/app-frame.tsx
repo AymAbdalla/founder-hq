@@ -1,34 +1,9 @@
-import Link from "next/link";
 import { signOut } from "@/app/actions";
 import { listProjects } from "@/lib/projects/data";
-import { Brand, Icon, type IconName } from "./icons";
+import { FrameMark, FrameMarkProvider, NavLinks, NotificationsLink, RailProjects } from "./frame-nav";
+import { Brand } from "./icons";
 import { ThemeSwitch } from "./theme-switch";
 import { TimeZoneSync } from "./time-zone-sync";
-
-export const VIEWS: { href: string; label: string; icon: IconName }[] = [
-  { href: "/", label: "Today", icon: "today" },
-  { href: "/inbox", label: "Inbox", icon: "inbox" },
-  { href: "/projects", label: "Projects", icon: "projects" },
-  { href: "/plans", label: "Plans", icon: "plans" },
-  { href: "/everything", label: "Everything", icon: "all" },
-];
-
-function NavLinks({ current }: { current: string }) {
-  return VIEWS.map((v) => (
-    <Link key={v.href} href={v.href} aria-current={v.href === current ? "page" : undefined}>
-      <Icon name={v.icon} />
-      {v.label}
-    </Link>
-  ));
-}
-
-function NotificationsLink({ current }: { current: string }) {
-  return (
-    <Link href="/notifications" className="icon-btn" aria-label="Notifications" title="Notifications" aria-current={current === "/notifications" ? "page" : undefined}>
-      <Icon name="bell" />
-    </Link>
-  );
-}
 
 function SignOut() {
   return (
@@ -38,59 +13,62 @@ function SignOut() {
   );
 }
 
-// The frame for signed-in pages. Computer: green-black side rail. Phone (760px and under):
-// top bar and bottom tabs instead. CSS shows one set and hides the other.
-// The rail also lists the account's active projects (archived ones leave it, spec P7).
-export async function AppFrame({ current, project, children }: { current: string; project?: string; children: React.ReactNode }) {
+// The frame for signed-in pages, drawn once by the signed-in layout and kept between pages.
+// Computer: green-black side rail. Phone (760px and under): top bar and bottom tabs instead.
+// CSS shows one set and hides the other. The rail also lists the account's active projects
+// (archived ones leave it, spec P7).
+export async function Frame({ children }: { children: React.ReactNode }) {
   const active = await listProjects("active");
-  const projects = active.ok ? active.value : [];
+  const projects = active.ok ? active.value.map((p) => ({ id: p.id, name: p.name })) : [];
   return (
-    <div className="app">
-      <a className="skip" href="#main">
-        Skip to main content
-      </a>
-      <aside className="rail">
-        <Brand />
-        <nav className="nav" aria-label="Main">
-          <NavLinks current={current} />
-        </nav>
-        {projects.length > 0 && (
-          <div className="rail-projects">
-            <h2 aria-hidden="true">Projects</h2>
-            <nav className="nav" aria-label="Your projects">
-              {projects.map((p) => (
-                <Link key={p.id} href={`/projects/${p.id}`} aria-current={p.id === project ? "page" : undefined}>
-                  <span className="pn">{p.name}</span>
-                </Link>
-              ))}
-            </nav>
-          </div>
-        )}
-        <div className="rail-foot">
-          <div className="foot-actions">
-            <NotificationsLink current={current} />
-            <ThemeSwitch />
-            <SignOut />
-          </div>
-        </div>
-      </aside>
-      <div className="main">
-        <header className="topbar">
+    <FrameMarkProvider>
+      <div className="app">
+        <a className="skip" href="#main">
+          Skip to main content
+        </a>
+        <aside className="rail">
           <Brand />
-          <div className="foot-actions">
-            <NotificationsLink current={current} />
-            <ThemeSwitch />
-            <SignOut />
+          <nav className="nav" aria-label="Main">
+            <NavLinks />
+          </nav>
+          <RailProjects projects={projects} />
+          <div className="rail-foot">
+            <div className="foot-actions">
+              <NotificationsLink />
+              <ThemeSwitch />
+              <SignOut />
+            </div>
           </div>
-        </header>
-        <main className="page" id="main" tabIndex={-1}>
-          {children}
-        </main>
+        </aside>
+        <div className="main">
+          <header className="topbar">
+            <Brand />
+            <div className="foot-actions">
+              <NotificationsLink />
+              <ThemeSwitch />
+              <SignOut />
+            </div>
+          </header>
+          <main className="page" id="main" tabIndex={-1}>
+            {children}
+          </main>
+        </div>
+        <nav className="tabbar" aria-label="Main">
+          <NavLinks />
+        </nav>
+        <TimeZoneSync />
       </div>
-      <nav className="tabbar" aria-label="Main">
-        <NavLinks current={current} />
-      </nav>
-      <TimeZoneSync />
-    </div>
+    </FrameMarkProvider>
+  );
+}
+
+// A signed-in page's content. The frame around it comes from the layout; this only tells the
+// frame which tab and project the page belongs to, for pages the address alone can't place.
+export function AppFrame({ current, project, children }: { current: string; project?: string; children: React.ReactNode }) {
+  return (
+    <>
+      <FrameMark current={current} project={project} />
+      {children}
+    </>
   );
 }

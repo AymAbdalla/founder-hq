@@ -1,7 +1,7 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
-import { setDoneAction } from "@/app/items/actions";
+import { setDoneAction } from "@/app/(hq)/items/actions";
 import { Icon } from "./icons";
 
 // The done checkbox on an item row. It turns green at once, saves, and the page redraws from

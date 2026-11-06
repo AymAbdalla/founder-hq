@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { connection } from "next/server";
 import { AppFrame } from "@/components/app-frame";
 import { WeekStrip } from "@/components/done-grid";
@@ -43,10 +43,10 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
     <AppFrame current="/projects">
       <div className="page-head">
         <h1>Projects</h1>
-        <Link href="/projects/new" className="btn btn-primary btn-small head-action">
+        <AppLink href="/projects/new" className="btn btn-primary btn-small head-action">
           <Icon name="plus" />
           New project
-        </Link>
+        </AppLink>
       </div>
 
       {!all.ok ? (
@@ -61,9 +61,9 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
           <div className="toolbar">
             <nav className="tabs" aria-label="Status">
               {PROJECT_STATUSES.map((s) => (
-                <Link key={s} href={s === "active" ? "/projects" : `/projects?status=${s}`} aria-current={s === status ? "page" : undefined}>
+                <AppLink key={s} href={s === "active" ? "/projects" : `/projects?status=${s}`} aria-current={s === status ? "page" : undefined}>
                   {STATUS_LABEL[s]} <span className="n">{count(s)}</span>
-                </Link>
+                </AppLink>
               ))}
             </nav>
             <form className="search" method="get" action="/projects" role="search">
@@ -95,7 +95,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
                       <span className="pname">
                         <StatusMark status={p.status} />
                         <span>
-                          <Link href={`/projects/${p.id}`}>{p.name}</Link>
+                          <AppLink href={`/projects/${p.id}`}>{p.name}</AppLink>
                           {(p.kind || p.summary) && <span className="sum">{[p.kind, p.summary].filter(Boolean).join(" · ")}</span>}
                         </span>
                       </span>
@@ -115,7 +115,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
 function SummaryCells({ summary }: { summary: ProjectSummary }) {
   return (
     <>
-      <td className="c-next">{summary.next ? <Link href={`/items/${summary.next.id}`}>{summary.next.title}</Link> : <span className="muted">No next step</span>}</td>
+      <td className="c-next">{summary.next ? <AppLink href={`/items/${summary.next.id}`}>{summary.next.title}</AppLink> : <span className="muted">No next step</span>}</td>
       <td className="num">{summary.open}</td>
       <td className="c-latest">
         {summary.latest && (

@@ -472,3 +472,20 @@ a.icon-btn { display: inline-grid; place-items: center; color: inherit; }
 .steps-box { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-top: 12px; }
 .steps-box p { margin: 0 0 6px; }
 .steps-box ol { margin: 0; padding-left: 20px; }
+
+/* While a tapped link loads: a thin green bar runs across the top, and a tapped tab or rail
+   link takes the "you are here" look at once. The pending marker is an empty span inside the
+   link (AppLink), so nothing moves. */
+.link-pending { display: none; }
+.app::before {
+  content: ""; position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 50; pointer-events: none;
+  background: var(--green); transform-origin: left; transform: scaleX(0); opacity: 0;
+}
+.app:has([data-pending])::before { opacity: 1; animation: nav-progress 2.4s cubic-bezier(0.1, 0.6, 0.3, 1) forwards; }
+@keyframes nav-progress { from { transform: scaleX(0.08); } to { transform: scaleX(0.9); } }
+.nav a:has([data-pending]) { background: var(--rail-2); color: var(--rail-text); }
+.nav:has([data-pending]) a[aria-current="page"]:not(:has([data-pending])) { background: none; color: var(--rail-text-2); }
+@media (max-width: 760px) {
+  .tabbar a:has([data-pending]) { color: var(--green); }
+  .tabbar:has([data-pending]) a[aria-current="page"]:not(:has([data-pending])) { color: var(--text-3); }
+}

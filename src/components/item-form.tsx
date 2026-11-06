@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import type { ItemSaveResult } from "@/app/items/actions";
+import type { ItemSaveResult } from "@/app/(hq)/items/actions";
 import { ITEM_KINDS, ITEM_NOTES_MAX, KIND_LABEL, TITLE_MAX } from "@/lib/items/input";
 import type { PickerProject } from "./items";
 

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { connection } from "next/server";
 import { AppFrame } from "@/components/app-frame";
 import { ItemNotFound, loadItem } from "@/components/items";
@@ -26,9 +26,9 @@ export default async function DeleteItemPage({ params }: { params: Promise<{ id:
             Delete item
           </button>
         </form>
-        <Link href={`/items/${item.id}`} className="btn">
+        <AppLink href={`/items/${item.id}`} className="btn">
           Cancel
-        </Link>
+        </AppLink>
       </div>
     </AppFrame>
   );

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AppLink } from "@/components/app-link";
 import { connection } from "next/server";
 import { AddItem } from "@/components/add-item";
 import { AppFrame } from "@/components/app-frame";
@@ -57,7 +57,7 @@ export default async function ProjectPage({
   return (
     <AppFrame current="/projects" project={project.id}>
       <nav className="crumbs" aria-label="Breadcrumb">
-        <Link href="/projects">Projects</Link> / <span>{project.name}</span>
+        <AppLink href="/projects">Projects</AppLink> / <span>{project.name}</span>
       </nav>
       <div className="page-head project-head">
         <StatusMark status={project.status} />
@@ -72,12 +72,12 @@ export default async function ProjectPage({
       {project.summary && <p className="lede">{project.summary}</p>}
 
       <div className="actions">
-        <Link href={`/projects/${project.id}/edit`} className="btn btn-small">Edit</Link>
+        <AppLink href={`/projects/${project.id}/edit`} className="btn btn-small">Edit</AppLink>
         {project.status === "active" && statusButton("paused", "Pause")}
         {project.status === "paused" && statusButton("active", "Resume")}
         {project.status !== "archived" && statusButton("archived", "Archive")}
         {project.status === "archived" && statusButton("active", "Reopen")}
-        <Link href={`/projects/${project.id}/delete`} className="btn btn-small btn-quiet-danger">Delete</Link>
+        <AppLink href={`/projects/${project.id}/delete`} className="btn btn-small btn-quiet-danger">Delete</AppLink>
       </div>
 
       <DoneGrid doneAts={doneHere} timeZone={zone} today={today} weeks={53} span="the last year" />

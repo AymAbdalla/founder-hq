@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { logEvent } from "@/lib/log";
 import { allRows } from "@/lib/supabase/all-rows";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -28,15 +29,21 @@ function failure(action: string, error: { code?: string }): { ok: false; message
   return { ok: false, message: error.code === "23505" ? DUPLICATE_NAME : GENERIC_FAILURE };
 }
 
-export async function listProjects(status?: ProjectStatus): Promise<ProjectResult<Project[]>> {
+// Every project the account has, loaded at most once per page render: the page, its project
+// pickers and the frame's project list all share this one request (React's per-request cache).
+const loadAllProjects = cache(async (): Promise<ProjectResult<Project[]>> => {
   const db = await createSupabaseServerClient();
-  const { data, error } = await allRows((from, to) => {
-    let query = db.from("projects").select(COLUMNS);
-    if (status) query = query.eq("status", status);
-    return query.order("created_at", { ascending: true }).order("id", { ascending: true }).range(from, to);
-  });
+  const { data, error } = await allRows((from, to) =>
+    db.from("projects").select(COLUMNS, { count: "exact" }).order("created_at", { ascending: true }).order("id", { ascending: true }).range(from, to),
+  );
   if (error) return failure("list", error);
   return { ok: true, value: data as Project[] };
+});
+
+export async function listProjects(status?: ProjectStatus): Promise<ProjectResult<Project[]>> {
+  const all = await loadAllProjects();
+  if (!all.ok || !status) return all;
+  return { ok: true, value: all.value.filter((p) => p.status === status) };
 }
 
 export async function getProject(id: string): Promise<ProjectResult<Project | null>> {
