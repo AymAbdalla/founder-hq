@@ -41,7 +41,7 @@
     "@types/web-push": "3.6.4",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.2",
-    "secretlint": "13.0.7",
+    "secretlint": "14.0.0",
     "supabase": "2.121.0",
     "typescript": "5.9.3",
     "vitest": "5.1.0"
