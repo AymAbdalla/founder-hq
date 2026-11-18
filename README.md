@@ -10,11 +10,21 @@ This repository is public to read. The code is not licensed for reuse: see [LICE
 
 ## Screens
 
-The development copy on an iPhone, installed from the Home Screen, dark mode.
+Invented sample data, not anyone's real projects. Taken from the production build in a 1440-pixel window and an iPhone-sized one.
 
-| Today | Projects | Everything | Inbox |
-| --- | --- | --- | --- |
-| <img src="docs/screenshots/today.png" width="200" alt="Today view: a year grid of done work, the add box, and two overdue items"> | <img src="docs/screenshots/projects.png" width="200" alt="Projects view: active, paused and archived tabs, and a row per project with open count and a seven-day strip"> | <img src="docs/screenshots/everything.png" width="200" alt="Everything view: search, kind, status and project filters over every item"> | <img src="docs/screenshots/inbox.png" width="200" alt="Inbox view: the add box with kind and project pickers, and an empty to-sort list"> |
+**Desktop.** Today: the year grid of done work, the add box, then what is overdue, due today, due this week or undated.
+
+<img src="docs/screenshots/desktop-today-dark.png" alt="Desktop Today view in dark mode: a side rail with the five views and three projects, a year grid of done work, the add box, and overdue, today, next 7 days and no-date lists">
+
+| A project page | Light mode |
+| --- | --- |
+| <img src="docs/screenshots/desktop-project-dark.png" alt="Desktop project page in dark mode: status, kind and summary, edit, pause, archive and delete buttons, the project's own year grid, its add box, and its to-dos, features and ideas, one of them waiting on another"> | <img src="docs/screenshots/desktop-today-light.png" alt="Desktop Today view in light mode, the same layout on a white page"> |
+
+**iPhone.** Installed from the Home Screen, it opens like an app with a tab bar.
+
+| Today | Projects | Everything |
+| --- | --- | --- |
+| <img src="docs/screenshots/phone-today-dark.png" width="260" alt="Phone Today view: year grid, add box and an overdue item"> | <img src="docs/screenshots/phone-projects-dark.png" width="260" alt="Phone Projects view: active, paused and archived tabs, search, and a row per project with its open count and a seven-day strip"> | <img src="docs/screenshots/phone-everything-dark.png" width="260" alt="Phone Everything view: search, kind, status and project filters, and every item with its project and due date, one waiting on another"> |
 
 Today shows what is overdue, due today and coming up, above a year grid shaded by how much was ticked done each day. Projects is one row per project with its open count and the last seven days. Everything is every item with search and filters. Anything added without a project lands in the Inbox.
 
