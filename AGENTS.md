@@ -7,7 +7,7 @@ Founder HQ is a free public web app for people building several projects with AI
 - **The spec is shared and read-only for agents.** If something in it looks wrong or missing, add an open item to the plan and ask Aym.
 - **Build in the plan's slices**, one at a time, on the branch `build-public-hq`. Never commit on `main`. Never push or merge without Aym's yes.
 - **Nothing in the product is specific to Aym.** No names, home-folder paths, repo names, seeded projects or personal data in code, defaults, placeholders or tests. Use invented sample data.
-- **`reference/` is the old personal page.** It is there only to look at for screens and behavior. It holds personal data. Never import from it, copy its data, or ship it.
+- **`reference/` is the old personal page, kept only on Aym's Mac.** Git ignores it and it is not in the published repository. It is there only to look at for screens and behavior. It holds personal data. Never import from it, copy its data, or ship it.
 - **Ask first** before anything the plan's Approval section lists as needing its own yes: installing tools outside this folder, signing up for services, registering GitHub apps, changing Claude Code or Codex settings, deploying, sending real notifications or emails, buying anything, pushing or merging.
 
 ## Commands

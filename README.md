@@ -7,7 +7,6 @@ This repository is public to read. The code is not licensed for reuse: see [LICE
 - What it does: [docs/SPEC.md](docs/SPEC.md)
 - How it is built, slice by slice: [docs/PLAN.md](docs/PLAN.md)
 - Rules for coding agents: [AGENTS.md](AGENTS.md)
-- The earlier personal page, kept for reference only: [reference/](reference/)
 
 ## Status (Nov 18, 2026)
 
@@ -50,7 +49,6 @@ The build runs in slices from the plan. Coding agents follow AGENTS.md. Each sli
 | `scripts/` | The build-secrets check and the local Supabase GitHub-mode switch |
 | `docs/` | Spec, plan, research and the agent records |
 | `public/` | Icons and the service worker for the installable app |
-| `reference/` | The earlier personal page, to look at only; nothing is imported from it |
 
 ## Run it
 

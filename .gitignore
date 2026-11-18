@@ -26,3 +26,6 @@ next-env.d.ts
 
 # Vercel project link (local only)
 .vercel
+
+# The old personal page: kept on Aym's Mac only, never published
+/reference/
