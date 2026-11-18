@@ -8,6 +8,16 @@ This repository is public to read. The code is not licensed for reuse: see [LICE
 - How it is built, slice by slice: [docs/PLAN.md](docs/PLAN.md)
 - Rules for coding agents: [AGENTS.md](AGENTS.md)
 
+## Screens
+
+The development copy on an iPhone, installed from the Home Screen, dark mode.
+
+| Today | Projects | Everything | Inbox |
+| --- | --- | --- | --- |
+| <img src="docs/screenshots/today.png" width="200" alt="Today view: a year grid of done work, the add box, and two overdue items"> | <img src="docs/screenshots/projects.png" width="200" alt="Projects view: active, paused and archived tabs, and a row per project with open count and a seven-day strip"> | <img src="docs/screenshots/everything.png" width="200" alt="Everything view: search, kind, status and project filters over every item"> | <img src="docs/screenshots/inbox.png" width="200" alt="Inbox view: the add box with kind and project pickers, and an empty to-sort list"> |
+
+Today shows what is overdue, due today and coming up, above a year grid shaded by how much was ticked done each day. Projects is one row per project with its open count and the last seven days. Everything is every item with search and filters. Anything added without a project lands in the Inbox.
+
 ## Status (Nov 18, 2026)
 
 Early build. The plan has 19 slices. A development copy runs on Vercel and Supabase with test data only.
